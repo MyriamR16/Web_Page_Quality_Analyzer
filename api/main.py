@@ -1,30 +1,12 @@
 from flask import Flask, jsonify
+from routes.analyse import analyse_bp
+from routes.generate import generate_bp
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return jsonify({
-        "message": "Bienvenue sur l'API Web Page Quality Analyzer",
-        "status": "success"
-    })
-
-@app.route('/health')
-def health():
-    return jsonify({
-        "status": "healthy",
-        "service": "Web Page Quality Analyzer API"
-    })
-
-@app.route('/test')
-def test():
-    return jsonify({
-        "message": "Test endpoint fonctionne!",
-        "data": {
-            "version": "1.0.0",
-            "framework": "Flask"
-        }
-    })
+# Register blueprints
+app.register_blueprint(analyse_bp)
+app.register_blueprint(generate_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
