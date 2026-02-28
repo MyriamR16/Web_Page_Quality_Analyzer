@@ -2,6 +2,7 @@ from urllib import request
 from urllib.parse import urljoin
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
+import requests
 
 def get_page_html(url: str) -> str :
     """
@@ -17,10 +18,18 @@ def get_page_html(url: str) -> str :
         Exception: If there is an error during the fetching process.
     """
     try:
-        response = request.get(url)
+        response = requests.get(url, timeout=30, verify=True)
         response.raise_for_status() 
         html_content = response.text
         return html_content
+    except requests.exceptions.SSLError:
+        # Retry without SSL verification if certificate fails
+        try:
+            response = requests.get(url, timeout=30, verify=False)
+            response.raise_for_status()
+            return response.text
+        except Exception as e:
+            raise Exception(f"Error fetching page HTML: {str(e)}")
     except Exception as e:
         raise Exception(f"Error fetching page HTML: {str(e)}")
 
@@ -92,7 +101,7 @@ def check_broken_links(soup: BeautifulSoup, base_url: str) -> list:
         href = link.get('href')
         
         # Skip anchors, javascript, mailto, and other non-HTTP links
-        if not href or href.startswith('#', 'javascript:', 'mailto:'):
+        if not href or href.startswith(('#', 'javascript:', 'mailto:')):
             continue
         
         # Convert relative URLs to absolute URLs in the case of internal links
