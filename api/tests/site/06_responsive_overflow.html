@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>06 - Responsive overflow</title>
+    <link rel="stylesheet" href="./base.css" />
+    <style>
+      .overflow-x {
+        width: 2400px;
+        height: 100px;
+        background: linear-gradient(90deg, #1f2937, #111827);
+        color: #fff;
+        padding: 16px;
+      }
+
+      .overflow-y {
+        height: 3200px;
+        background: repeating-linear-gradient(
+          180deg,
+          #e5e7eb,
+          #e5e7eb 40px,
+          #f3f4f6 40px,
+          #f3f4f6 80px
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Responsive overflow volontaire</h1>
+      <p>Cette page force du débordement horizontal et vertical.</p>
+      <div class="overflow-x">Bloc trop large pour mobile/tablette.</div>
+      <div class="overflow-y"></div>
+    </main>
+  </body>
+</html>

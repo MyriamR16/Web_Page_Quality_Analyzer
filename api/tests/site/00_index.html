@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fixtures de test - Web Page Quality Analyzer</title>
+    <link rel="stylesheet" href="./base.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Fixtures HTML/CSS/JS pour tests exhaustifs</h1>
+      <p>Ouvre chaque page avec ton endpoint /analyse?url=...</p>
+
+      <ol>
+        <li><a href="./01_ok_page.html">01 - Page de référence (quasi saine)</a></li>
+        <li><a href="./02_broken_links_images.html">02 - Liens/images cassés</a></li>
+        <li><a href="./03_accessibility_issues.html">03 - Accessibilité (alt + textes)</a></li>
+        <li><a href="./04_js_errors_and_interactions.html">04 - Erreurs JavaScript (console/pageerror/clic/form)</a></li>
+        <li><a href="./05_unsecure_forms_and_cookies.html">05 - Sécurité (forms non HTTPS + cookies faibles)</a></li>
+        <li><a href="./06_responsive_overflow.html">06 - Responsive overflow horizontal/vertical</a></li>
+        <li><a href="./07_performance_stress.html">07 - Performance (taille + beaucoup de requêtes)</a></li>
+        <li><a href="./08_invalid_html.html">08 - HTML invalide (W3C)</a></li>
+      </ol>
+    </main>
+  </body>
+</html>

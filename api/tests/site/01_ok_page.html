@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>01 - OK page</title>
+    <link rel="stylesheet" href="./base.css" />
+    <script defer src="./safe.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <h1>Page de référence</h1>
+      <nav>
+        <a href="./00_index.html">Retour index</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section>
+        <h2>Contenu</h2>
+        <p>Cette page sert de baseline pour comparer les autres scénarios.</p>
+      </section>
+
+      <section>
+        <h2>Accessibilité de base</h2>
+        <img src="./pixel-ok.svg" alt="Pixel décoratif" width="80" height="80" />
+        <button type="button" id="safeButton">Action sûre</button>
+      </section>
+
+      <section>
+        <h2>Formulaire</h2>
+        <form id="safeForm" method="get" action="./01_ok_page.html">
+          <label for="q">Recherche</label>
+          <input id="q" name="q" type="text" />
+          <button type="submit">Envoyer</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

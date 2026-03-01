@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05 - Unsecure forms and cookies</title>
+    <link rel="stylesheet" href="./base.css" />
+    <script defer src="./cookie-playground.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Sécurité: formulaires et cookies</h1>
+
+      <section>
+        <h2>Forms POST non sécurisés</h2>
+        <form method="POST" action="http://example.com/insecure-submit">
+          <input type="text" name="email" value="test@example.com" />
+          <button type="submit">Submit insecure HTTP</button>
+        </form>
+
+        <form method="POST" action="https://example.com/secure-submit">
+          <input type="text" name="email" value="ok@example.com" />
+          <button type="submit">Submit secure HTTPS</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Cookies</h2>
+        <p>Le JS crée des cookies sans HttpOnly / sans Secure / sans SameSite.</p>
+      </section>
+    </main>
+  </body>
+</html>

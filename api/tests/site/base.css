@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+a {
+  color: #1d4ed8;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+section {
+  margin-block: 20px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+#images-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+#images-grid img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}

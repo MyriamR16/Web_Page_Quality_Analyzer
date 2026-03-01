@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>04 - JS errors and interactions</title>
+    <link rel="stylesheet" href="./base.css" />
+    <script defer src="./error-playground.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Erreurs JavaScript volontaires</h1>
+      <p>Cette page produit des erreurs console + pageerror + erreurs sur interaction.</p>
+
+      <section>
+        <h2>Interactions</h2>
+        <button id="boomButton" type="button">Cliquer pour throw</button>
+
+        <form id="boomForm" method="post" action="./04_js_errors_and_interactions.html">
+          <input type="text" name="name" value="test" />
+          <button type="submit">Submit avec erreur</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

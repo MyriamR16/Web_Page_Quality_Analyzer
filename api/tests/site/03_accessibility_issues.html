@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03 - Accessibility issues</title>
+    <link rel="stylesheet" href="./base.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Accessibilité: cas problématiques</h1>
+
+      <section>
+        <h2>Images sans alt utile</h2>
+        <img src="./pixel-ok.svg" />
+        <img src="./pixel-ok.svg" alt="   " />
+        <img src="./pixel-ok.svg" alt="Description correcte" />
+      </section>
+
+      <section>
+        <h2>Liens/boutons sans texte descriptif</h2>
+        <a href="./01_ok_page.html"></a>
+        <button type="button"></button>
+
+        <a href="./01_ok_page.html">Voir la page de référence</a>
+        <button type="button">Valider</button>
+      </section>
+    </main>
+  </body>
+</html>

@@ -49,7 +49,7 @@ async def check_ssl_certificate(url: str) -> Error:
     except (ssl.SSLError, aiohttp.ClientSSLError):
         return Error(
             type=ErrorType.SECURITY,
-            subtype=ErrorSubType.INVALID_SSL_CERTIFICATE,
+            subtype=ErrorSubType.INVALID_SSL_CERT,
             message="The URL has an invalid SSL certificate.",
         )
     except Exception:

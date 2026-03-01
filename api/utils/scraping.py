@@ -109,6 +109,10 @@ def check_broken_links(soup: BeautifulSoup, base_url: str) -> list:
         result = check_broken_link(absolute_url, base_url)
         if not result:
             continue
+        
+        result['link_text'] = link.get_text(strip=True) or '(no text)'
+        result['href_attr'] = href
+        result['html'] = str(link)[:200]
         broken_links.append(result)
     
     return broken_links
@@ -141,6 +145,10 @@ def check_broken_images(soup: BeautifulSoup, base_url: str) -> list:
         result = check_broken_link(absolute_url, base_url)
         if not result:
             continue
+        
+        result['alt_text'] = img.get('alt', '(missing alt)') or '(empty alt)'
+        result['src_attr'] = src
+        result['html'] = str(img)[:200]
         broken_images.append(result)
         
     return broken_images
@@ -154,14 +162,18 @@ def check_alt_attributes(soup: BeautifulSoup) -> list:
         soup (BeautifulSoup): A BeautifulSoup object representing the parsed HTML.
     
     Returns:
-        list: A list of image URLs that do not have alt attributes.
+        list: A list of images without alt attributes with context.
     """
     images_without_alt = []
     images = soup.find_all('img')
 
     for img in images:
         if not img.has_attr('alt') or not img['alt'].strip():
-            images_without_alt.append(img.get('src', ''))
+            images_without_alt.append({
+                'src': img.get('src', '(no src)'),
+                'alt': img.get('alt', '(missing)'),
+                'html': str(img)[:200],
+            })
     return images_without_alt
 
 def check_descriptive_text(soup: BeautifulSoup) -> list:
@@ -182,7 +194,8 @@ def check_descriptive_text(soup: BeautifulSoup) -> list:
         if not text:
             non_descriptive_elements.append({
                 'type': 'link',
-                'element': str(link),
+                'href': link.get('href', '(no href)'),
+                'html': str(link)[:200],
             })
     
     # Check buttons
@@ -192,6 +205,6 @@ def check_descriptive_text(soup: BeautifulSoup) -> list:
         if not text:
             non_descriptive_elements.append({
                 'type': 'button',
-                'element': str(button),
+                'html': str(button)[:200],
             })
     return non_descriptive_elements

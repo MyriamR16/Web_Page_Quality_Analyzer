@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>02 - Broken links/images</title>
+    <link rel="stylesheet" href="./base.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Liens et images cassés</h1>
+      <a href="./00_index.html">Lien valide</a>
+      <a href="./missing-page-1.html">Lien cassé 1</a>
+      <a href="./deep/missing-page-2.html">Lien cassé 2</a>
+      <a href="#ancre">Ancre interne (ignore)</a>
+      <a href="javascript:void(0)">Javascript pseudo-link (ignore)</a>
+
+      <img src="./pixel-ok.svg" alt="Image valide" />
+      <img src="./missing-image-1.png" alt="Image cassée 1" />
+      <img src="./img/missing-image-2.jpg" alt="Image cassée 2" />
+    </main>
+  </body>
+</html>
