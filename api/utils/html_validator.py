@@ -3,7 +3,6 @@ from objects.error import Error
 from error_enums.error_type import ErrorType
 from error_enums.error_subtype import ErrorSubType
 
-
 def validate_html_w3c(url: str) -> list[Error]:
     """
     Validates HTML structure using W3C Validator API.
