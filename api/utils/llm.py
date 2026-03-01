@@ -2,7 +2,7 @@ import os
 import logging
 import json
 from typing import List, Dict, Any
-import openai
+import cohere
 
 logger = logging.getLogger(__name__)
 
@@ -51,13 +51,13 @@ Respond in JSON format:
 }}"""
     
     try:
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("COHERE_API_KEY")
         if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable not set")
+            raise ValueError("COHERE_API_KEY environment variable not set")
         
-        client = openai.OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
+        co = cohere.ClientV2(api_key=api_key)
+        response = co.chat(
+            model="command-r-plus-08-2024",
             messages=[
                 {"role": "system", "content": "You are a web quality analysis expert."},
                 {"role": "user", "content": prompt}
@@ -66,7 +66,7 @@ Respond in JSON format:
             max_tokens=2000
         )
         
-        response_text = response.choices[0].message.content
+        response_text = response.message.content[0].text
         
         # Extract JSON from markdown code blocks if present
         if "```json" in response_text:
@@ -77,7 +77,7 @@ Respond in JSON format:
         return json.loads(response_text)
     
     except Exception as e:
-        logger.error(f"OpenAI report generation failed: {e}")
+        logger.error(f"Cohere report generation failed: {e}")
         raise
 
 
