@@ -88,7 +88,7 @@ async def check_performance_errors(
         await browser.close()
 
     # Check page size
-    page_size_mb = total_size / (1024 * 1024)
+    page_size_mb = total_size / (1024 * 1024) 
     if page_size_mb > page_size_threshold:
         errors.append(
             Error(
