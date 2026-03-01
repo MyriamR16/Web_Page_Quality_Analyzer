@@ -24,7 +24,7 @@ class ErrorSubType(Enum):
     # Security SubErrors
     MISSING_HTTPS = "missing_https"
     INVALID_SSL_CERT = "invalid_ssl_cert"
-    UNSECURE_COOKIE = "unsecure_cookie"
+    UNSECURE_FORM = "unsecure_form"
     COOKIE_MISSING_SECURE_FLAG = "cookie_missing_secure_flag"
     COOKIE_MISSING_HTTPONLY_FLAG = "cookie_missing_httponly_flag"
     COOKIE_MISSING_SAMESITE_FLAG = "cookie_missing_samesite_flag"
