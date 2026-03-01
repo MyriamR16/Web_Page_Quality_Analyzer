@@ -1,6 +1,10 @@
 from flask import Flask, jsonify
+from dotenv import load_dotenv
 from routes.analyse import analyse_bp
 from routes.generate import generate_bp
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
