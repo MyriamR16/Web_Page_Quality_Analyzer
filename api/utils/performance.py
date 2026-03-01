@@ -55,7 +55,9 @@ async def check_performance_errors(
 
         start_time = time.time()
         try:
-            await page.goto(url, wait_until="networkidle", timeout=30000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            # Wait for images and resources to load
+            await page.wait_for_load_state("networkidle", timeout=10000)
         except Exception as exc:
             logger.warning("Navigation error on %s: %s", url, exc)
         load_time = time.time() - start_time
@@ -66,7 +68,7 @@ async def check_performance_errors(
                 () => {
                     const entries = performance.getEntriesByType('resource');
                     return entries
-                        .filter(e => e.initiatorType === 'img')
+                        .filter(e => e.initiatorType === 'img' && e.duration > 0)
                         .map(e => ({ url: e.name, duration: Math.round(e.duration) }));
                 }
             """)
