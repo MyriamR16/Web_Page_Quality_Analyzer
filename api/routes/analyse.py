@@ -9,6 +9,7 @@ from error_enums.error_type import ErrorType
 from error_enums.error_subtype import ErrorSubType
 from utils.html_validator import validate_html_w3c
 from utils.scraping import get_page_html, get_soup, check_broken_links, check_broken_images, check_alt_attributes, check_descriptive_text
+from utils.readability import check_readability
 from utils.security import check_https, check_ssl_certificate, check_unsecure_forms, check_cookies_flags
 from utils.javascript_validator import check_console_exceptions, check_buttons_forms, check_responsiveness
 from utils.performance import check_performance_errors
@@ -100,6 +101,7 @@ async def collect_all_errors(url: str) -> List[Error]:
         soup = get_soup(html)
 
         errors.extend(_map_scraping_checks_to_errors(soup, url))
+        errors.extend(check_readability(soup))
     except Exception as e:
         print(f"Scraping error: {e}")
     
@@ -121,8 +123,7 @@ async def collect_all_errors(url: str) -> List[Error]:
     # JavaScript checks
     try:
         errors.extend(await check_console_exceptions(url))
-        # Disabled for performance - clicking all buttons is very slow
-        # errors.extend(await check_buttons_forms(url))
+        errors.extend(await check_buttons_forms(url))
         errors.extend(await check_responsiveness(url))
     except Exception as e:
         print(f"JavaScript check error: {e}")
