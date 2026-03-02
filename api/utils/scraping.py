@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
 import requests
+from playwright.sync_api import sync_playwright
 
 def get_page_html(url: str) -> str :
     """
@@ -45,41 +46,90 @@ def get_soup(html : str) -> BeautifulSoup:
     """
     return BeautifulSoup(html, 'html.parser')
 
+
+def _check_link_with_playwright(absolute_url: str) -> dict | None:
+    """
+    Confirms link availability using a real browser navigation.
+    Returns broken-link dict only when browser gets HTTP >= 400.
+    """
+    try:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            page = browser.new_page()
+            response = page.goto(absolute_url, wait_until='domcontentloaded', timeout=15000)
+            status_code = response.status if response else None
+            browser.close()
+
+            if status_code is not None and status_code >= 400:
+                return {
+                    'url': absolute_url,
+                    'status_code': status_code,
+                }
+            return None
+    except Exception:
+        return None
+
 def check_broken_link(absolute_url: str, base_url: str) -> dict:
     # Skip the base URL itself
     if absolute_url == base_url:
         return None
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+    }
+
     try:
-        # Create a HEAD request to check if the link is valid
-        req = request.Request(absolute_url, method='HEAD')
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)') # User-Agent header to not let think im a bot
-        
-        response = request.urlopen(req, timeout=5)
+        # Trying HEAD first
+        req = request.Request(absolute_url, method='HEAD', headers=headers)
+        response = request.urlopen(req, timeout=10)
         status_code = response.status
-        
-        # If status code is >= 400, it's a broken link 
+
         if status_code >= 400:
             return {
                 'url': absolute_url,
                 'status_code': status_code,
             }
-        
-        return None # Link is not broken
-            
+        return None
+
     except HTTPError as e:
-        # HTTPError is raised for 4xx and 5xx status codes
-        return {
-            'url': absolute_url,
-            'status_code': e.code,
-            'error': str(e),
-        }
-    except (URLError, Exception) as e:
-        # URLError or other exceptions (timeout, connection error, etc.)
-        return {
-            'url': absolute_url,
-            'status_code': None,
-            'error': str(e),
-        }
+        # Some servers reject HEAD; retry with GET before flagging broken
+        if e.code in (403, 405):
+            try:
+                get_req = request.Request(absolute_url, headers=headers)
+                get_response = request.urlopen(get_req, timeout=10)
+                get_status = get_response.status
+                if get_status >= 400:
+                    return {
+                        'url': absolute_url,
+                        'status_code': get_status,
+                    }
+                return None
+            except HTTPError as get_error:
+                if get_error.code >= 400:
+                    return {
+                        'url': absolute_url,
+                        'status_code': get_error.code,
+                        'error': str(get_error),
+                    }
+                return None
+            except (URLError, Exception):
+                # Network or anti-bot issue: not enough proof that link is broken
+                return None
+
+        if e.code >= 400:
+            playwright_result = _check_link_with_playwright(absolute_url)
+            if playwright_result:
+                playwright_result['error'] = str(e)
+                return playwright_result
+            return None
+        return None
+
+    except (URLError, Exception):
+        # Timeout/DNS/connection issues are not reliable proof of broken link
+        return None
 
 def check_broken_links(soup: BeautifulSoup, base_url: str) -> list:
     """
@@ -176,6 +226,33 @@ def check_alt_attributes(soup: BeautifulSoup) -> list:
             })
     return images_without_alt
 
+
+def _has_accessible_name(element, soup: BeautifulSoup) -> bool:
+    aria_label = (element.get('aria-label') or '').strip()
+    title = (element.get('title') or '').strip()
+    if aria_label or title:
+        return True
+
+    aria_labelledby = (element.get('aria-labelledby') or '').strip()
+    if aria_labelledby:
+        for label_id in aria_labelledby.split():
+            labelled = soup.find(id=label_id)
+            if labelled and labelled.get_text(strip=True):
+                return True
+
+    for img in element.find_all('img'):
+        alt = (img.get('alt') or '').strip()
+        if alt:
+            return True
+
+    for media in element.find_all(['svg', 'i']):
+        media_aria = (media.get('aria-label') or '').strip()
+        media_title = (media.get('title') or '').strip()
+        if media_aria or media_title:
+            return True
+
+    return False
+
 def check_descriptive_text(soup: BeautifulSoup) -> list:
     """
     Checks for absence of descriptive text in links and buttons.
@@ -191,7 +268,7 @@ def check_descriptive_text(soup: BeautifulSoup) -> list:
     links = soup.find_all('a')
     for link in links:
         text = link.get_text(strip=True)
-        if not text:
+        if not text and not _has_accessible_name(link, soup):
             non_descriptive_elements.append({
                 'type': 'link',
                 'href': link.get('href', '(no href)'),
@@ -202,7 +279,7 @@ def check_descriptive_text(soup: BeautifulSoup) -> list:
     buttons = soup.find_all('button')
     for button in buttons:
         text = button.get_text(strip=True)
-        if not text:
+        if not text and not _has_accessible_name(button, soup):
             non_descriptive_elements.append({
                 'type': 'button',
                 'html': str(button)[:200],

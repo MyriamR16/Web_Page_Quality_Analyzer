@@ -5,6 +5,8 @@ from objects.error import Error
 from error_enums.error_type import ErrorType
 from error_enums.error_subtype import ErrorSubType
 from playwright.async_api import async_playwright
+import requests
+from bs4 import BeautifulSoup
 
 
 logger = logging.getLogger(__name__)
@@ -148,60 +150,33 @@ async def check_buttons_forms(url: str) -> List[Error]:
 
 async def check_responsiveness(url: str) -> List[Error]:
     """
-    Checks if the web page is responsive and adapts correctly to different screen sizes.
+    Checks if the web page has a viewport meta tag for responsive design.
     Args:
         url (str): The URL of the web page to check for responsiveness.
     Returns:
-        List[Error]: A list of Error objects representing any responsiveness issues found on the web page
+        List[Error]: A list of Error objects if viewport meta tag is missing
     """
     errors: List[Error] = []
-    viewports = [
-        {"width": 375, "height": 667},
-        {"width": 768, "height": 1024},
-        {"width": 1366, "height": 768},
-    ]
-
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=True)
-
-        for viewport in viewports:
-            page = await browser.new_page(viewport=viewport)
-            try:
-                await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-                has_horizontal_overflow = await page.evaluate(
-                    "() => document.documentElement.scrollWidth > window.innerWidth + 1"
+    
+    try:
+        response = requests.get(url, timeout=15, verify=False)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Check for viewport meta tag in head
+        viewport_meta = soup.find('meta', attrs={'name': 'viewport'})
+        
+        if not viewport_meta:
+            errors.append(
+                Error(
+                    type=ErrorType.USER_EXPERIENCE,
+                    subtype=ErrorSubType.NON_RESPONSIVE_LAYOUT,
+                    message="Missing viewport meta tag - page is not configured for responsive design",
                 )
-                has_vertical_overflow = await page.evaluate(
-                    "() => document.documentElement.scrollHeight > window.innerHeight + 1"
-                )
-
-                if has_horizontal_overflow:
-                    errors.append(
-                        Error(
-                            type=ErrorType.USER_EXPERIENCE,
-                            subtype=ErrorSubType.NON_RESPONSIVE_LAYOUT,
-                            message=f"Horizontal overflow detected at {viewport['width']}x{viewport['height']}",
-                        )
-                    )
-                if has_vertical_overflow:
-                    errors.append(
-                        Error(
-                            type=ErrorType.USER_EXPERIENCE,
-                            subtype=ErrorSubType.NON_RESPONSIVE_LAYOUT,
-                            message=f"Vertical overflow detected at {viewport['width']}x{viewport['height']}",
-                        )
-                    )
-            except Exception as exc:
-                errors.append(
-                    Error(
-                        type=ErrorType.USER_EXPERIENCE,
-                        subtype=ErrorSubType.NON_RESPONSIVE_LAYOUT,
-                        message=f"Responsive check failed at {viewport['width']}x{viewport['height']}: {exc}",
-                    )
-                )
-            finally:
-                await page.close()
-
-        await browser.close()
+            )
+    except Exception as exc:
+        # If we can't check, don't report an error
+        logger.debug("Could not check responsiveness for %s: %s", url, exc)
+    
     return errors
 

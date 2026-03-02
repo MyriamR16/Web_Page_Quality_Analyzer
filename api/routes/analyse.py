@@ -121,7 +121,8 @@ async def collect_all_errors(url: str) -> List[Error]:
     # JavaScript checks
     try:
         errors.extend(await check_console_exceptions(url))
-        errors.extend(await check_buttons_forms(url))
+        # Disabled for performance - clicking all buttons is very slow
+        # errors.extend(await check_buttons_forms(url))
         errors.extend(await check_responsiveness(url))
     except Exception as e:
         print(f"JavaScript check error: {e}")

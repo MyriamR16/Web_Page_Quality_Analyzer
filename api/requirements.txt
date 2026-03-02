@@ -1,0 +1,9 @@
+flask
+flask-cors
+flask-pydantic
+pydantic
+beautifulsoup4
+requests
+python-dotenv
+playwright
+cohere
