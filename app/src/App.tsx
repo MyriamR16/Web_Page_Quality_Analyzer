@@ -40,10 +40,6 @@ function App() {
 
   const filterErrors = (errors: AnalysisError[]): AnalysisError[] => {
     return errors.filter((err) => {
-      // Exclure les erreurs HTTPS manquante
-      if (err.type === 'security_error' && err.subtype === 'missing_https') {
-        return false
-      }
       // Exclure les erreurs de ressources non trouvées
       if (err.type === 'javascript_error' && err.message.includes('Failed to load resource')) {
         return false

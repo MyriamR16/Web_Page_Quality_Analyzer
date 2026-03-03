@@ -120,11 +120,11 @@ def check_broken_link(absolute_url: str, base_url: str) -> dict:
                 return None
 
         if e.code >= 400:
-            playwright_result = _check_link_with_playwright(absolute_url)
-            if playwright_result:
-                playwright_result['error'] = str(e)
-                return playwright_result
-            return None
+            return {
+                'url': absolute_url,
+                'status_code': e.code,
+                'error': str(e),
+            }
         return None
 
     except (URLError, Exception):
