@@ -60,9 +60,41 @@ def _extract_line_height(value: str) -> float | None:
     return None
 
 
+def _check_sentence_length(text: str, max_words: int = 35) -> List[tuple[str, int]]:
+    """
+    Extract sentences and check if they exceed the recommended word count.
+    Longer sentences are harder to read and reduce comprehension.
+    
+    Args:
+        text (str): Text content to analyze.
+        max_words (int): Maximum recommended words per sentence.
+    
+    Returns:
+        List[tuple]: List of (sentence, word_count) for sentences exceeding max_words.
+    """
+    # Split by sentence-ending punctuation
+    sentences = re.split(r'[.!?]+', text)
+    long_sentences = []
+    
+    for sentence in sentences:
+        # Clean and count words
+        cleaned = sentence.strip()
+        if not cleaned:
+            continue
+        
+        words = cleaned.split()
+        word_count = len(words)
+        
+        # Flag sentences exceeding threshold
+        if word_count > max_words:
+            long_sentences.append((cleaned[:100], word_count))  # Store first 100 chars
+    
+    return long_sentences
+
+
 def check_readability(soup: BeautifulSoup) -> List[Error]:
     """
-    Checks text readability: font size, line-height.
+    Checks text readability: font size, line-height, and sentence length.
     
     Args:
         soup (BeautifulSoup): Parsed HTML document.
@@ -121,5 +153,25 @@ def check_readability(soup: BeautifulSoup) -> List[Error]:
                     )
                 )
                 break
+    
+    # Check sentence length in text content
+    text_elements = soup.find_all(['p', 'li', 'span', 'div'])
+    sentence_check_count = 0
+    for elem in text_elements:
+        if sentence_check_count >= 5:  # Limit checks for performance
+            break
+        
+        text = elem.get_text(strip=True)
+        if text and len(text.split()) > 30:  # Only check text with at least 10 words
+            long_sentences = _check_sentence_length(text, max_words=35)
+            for sentence, word_count in long_sentences:
+                errors.append(
+                    Error(
+                        type=ErrorType.USER_EXPERIENCE,
+                        subtype=ErrorSubType.READABILITY_SENTENCE_LENGTH,
+                        message=f"Sentence too long ({word_count} words, max 35 recommended for readability): '{sentence}...'",
+                    )
+                )
+                sentence_check_count += 1
     
     return errors

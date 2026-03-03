@@ -35,9 +35,9 @@ Generate:
 1. A clear summary (2-3 sentences)
 2. Improvement recommendations (bullet points)
 3. Prioritization of issues:
-   - CRITICAL: Must fix immediately (security, major functionality). If there are no critical issues, say "No critical issues detected."
-   - WARNING: Should fix soon (performance, UX)
-   - INFO: Nice to have (accessibility, minor issues)
+   - CRITICAL: Must fix immediately (security, accessibility, performance issues, ... what you think is critical). If there are no critical issues, say "No critical issues detected."
+   - WARNING: Should fix soon (UX, or anything else you think is important but not critical). If there are no warning issues, say "No warning issues detected."
+   - INFO: Nice to have (minor issues)
 
 Respond in JSON format:
 {{

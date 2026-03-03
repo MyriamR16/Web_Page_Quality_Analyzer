@@ -1,6 +1,12 @@
 # Web Page Quality Analyzer
 
-A web page quality analyzer with:
+## About
+
+Web Page Quality Analyzer provides a comprehensive toolkit for assessing website quality through automated analysis, and generates comprehensive quality reports.
+
+## Architecture
+
+The application consists of:
 - a Flask API (`api/`)
 - a React + Vite frontend (`app/`)
 

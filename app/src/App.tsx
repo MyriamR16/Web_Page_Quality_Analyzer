@@ -118,6 +118,74 @@ function App() {
     }
   }
 
+  const handleDownloadPDF = async () => {
+    if (!report) return
+    
+    try {
+      const response = await fetch('http://localhost:5000/download-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: report.url,
+          report: report.report,
+        }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to download PDF')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `report_${new Date().getTime()}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      setReportError(err instanceof Error ? err.message : 'Failed to download PDF')
+      console.error('PDF download error:', err)
+    }
+  }
+
+  const handleDownloadJSON = async () => {
+    if (!report) return
+    
+    try {
+      const response = await fetch('http://localhost:5000/download-json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: report.url,
+          report: report.report,
+        }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to download JSON')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `report_${new Date().getTime()}.json`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      setReportError(err instanceof Error ? err.message : 'Failed to download JSON')
+      console.error('JSON download error:', err)
+    }
+  }
+
   return (
     <>
       <header className="header"></header>
@@ -228,6 +296,24 @@ function App() {
                         </ul>
                       </div>
                     )}
+                    
+                    <div className="download-section">
+                      <h3>Download Report</h3>
+                      <div className="download-buttons">
+                        <button 
+                          onClick={handleDownloadPDF}
+                          className="download-button download-pdf"
+                        >
+                          📄 Download as PDF
+                        </button>
+                        <button 
+                          onClick={handleDownloadJSON}
+                          className="download-button download-json"
+                        >
+                          📋 Download as JSON
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

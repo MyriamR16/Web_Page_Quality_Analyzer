@@ -8,6 +8,7 @@ class ErrorSubType(Enum):
     READABILITY_CONTRAST = "readability_contrast"
     READABILITY_FONT_SIZE = "readability_font_size"
     READABILITY_LINE_HEIGHT = "readability_line_height"
+    READABILITY_SENTENCE_LENGTH = "readability_sentence_length"
     NON_RESPONSIVE_LAYOUT = "non_responsive_layout"
     BROKEN_BUTTON = "broken_button"
     BROKEN_FORM = "broken_form"
