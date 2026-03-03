@@ -104,12 +104,12 @@ h1 {
 
 .error-message {
   margin-top: 2rem;
-  padding: 1rem;
+  padding:1rem;
   background: #fee;
   border: 1px solid #fcc;
   border-radius: 8px;
   color: #c00;
-  width: 100%;
+  width: 95%;
 }
 
 .results-container {
@@ -277,6 +277,37 @@ h1 {
   font-size: 0.95rem;
   color: #64748b;
   margin: 0 0 1rem 0;
+}
+
+.error-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.filter-button:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.filter-button.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
 }
 
 .errors-list {

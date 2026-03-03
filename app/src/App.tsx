@@ -36,6 +36,7 @@ function App() {
   const [reportLoading, setReportLoading] = useState(false)
   const [report, setReport] = useState<ReportResult | null>(null)
   const [reportError, setReportError] = useState<string | null>(null)
+  const [selectedErrorType, setSelectedErrorType] = useState<string>('all')
 
   const filterErrors = (errors: AnalysisError[]): AnalysisError[] => {
     return errors.filter((err) => {
@@ -51,6 +52,19 @@ function App() {
     })
   }
 
+  const getUniqueErrorTypes = (errors: AnalysisError[]): string[] => {
+    const types = new Set<string>()
+    errors.forEach(err => types.add(err.type))
+    return Array.from(types).sort()
+  }
+
+  const filterByErrorType = (errors: AnalysisError[]): AnalysisError[] => {
+    if (selectedErrorType === 'all') {
+      return errors
+    }
+    return errors.filter(err => err.type === selectedErrorType)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -58,6 +72,7 @@ function App() {
     setResult(null)
     setReport(null)
     setReportError(null)
+    setSelectedErrorType('all')
 
     try {
       const response = await fetch(`http://localhost:5000/analyse?url=${encodeURIComponent(url)}`)
@@ -217,11 +232,29 @@ function App() {
             <div className="columns">
               <div className="left-column">
                 <h2>Errors Detected</h2>
-                <p className="total-errors">Total: {filterErrors(result.errors).length}</p>
+                <p className="total-errors">Total: {filterByErrorType(filterErrors(result.errors)).length}</p>
                 
-                {filterErrors(result.errors).length > 0 && (
+                <div className="error-filter">
+                  <button 
+                    className={`filter-button ${selectedErrorType === 'all' ? 'active' : ''}`}
+                    onClick={() => setSelectedErrorType('all')}
+                  >
+                    All ({filterErrors(result.errors).length})
+                  </button>
+                  {getUniqueErrorTypes(filterErrors(result.errors)).map((type) => (
+                    <button
+                      key={type}
+                      className={`filter-button ${selectedErrorType === type ? 'active' : ''}`}
+                      onClick={() => setSelectedErrorType(type)}
+                    >
+                      {type.replace(/_/g, ' ')} ({filterErrors(result.errors).filter(e => e.type === type).length})
+                    </button>
+                  ))}
+                </div>
+                
+                {filterByErrorType(filterErrors(result.errors)).length > 0 && (
                   <div className="errors-list">
-                    {filterErrors(result.errors).map((err, index) => (
+                    {filterByErrorType(filterErrors(result.errors)).map((err, index) => (
                       <div key={index} className="error-item">
                         <span className="error-type">{err.type}</span>
                         <span className="error-subtype">{err.subtype}</span>
