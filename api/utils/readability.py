@@ -7,6 +7,44 @@ from error_enums.error_type import ErrorType
 from error_enums.error_subtype import ErrorSubType
 
 
+def hex_to_rgb(hex_color: str):
+    """Convert hex color to RGB tuple."""
+    hex_color = hex_color.lstrip('#')
+    if len(hex_color) == 3:
+        hex_color = ''.join([c*2 for c in hex_color])
+    try:
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    except ValueError:
+        return None
+
+
+def relative_luminance(rgb):
+    """Calculate relative luminance of a color."""
+    if not rgb or len(rgb) != 3:
+        return None
+    
+    def srgb_to_linear(c):
+        c = c / 255
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    
+    r_lin, g_lin, b_lin = [srgb_to_linear(c) for c in rgb]
+    return 0.2126 * r_lin + 0.7152 * g_lin + 0.0722 * b_lin
+
+
+def contrast_ratio(rgb_text, rgb_bg):
+    """Calculate contrast ratio between text and background colors (WCAG)."""
+    if not rgb_text or not rgb_bg:
+        return None
+    
+    L1 = relative_luminance(rgb_text)
+    L2 = relative_luminance(rgb_bg)
+    
+    if L1 is None or L2 is None:
+        return None
+    
+    return (max(L1, L2) + 0.05) / (min(L1, L2) + 0.05)
+
+
 def _extract_size_px(value: str) -> float | None:
     """Extract font size in pixels from CSS value."""
     if not value:
@@ -154,24 +192,44 @@ def check_readability(soup: BeautifulSoup) -> List[Error]:
                 )
                 break
     
-    # Check sentence length in text content
+    # Check sentence length and color contrast in text content
     text_elements = soup.find_all(['p', 'li', 'span', 'div'])
-    sentence_check_count = 0
+    
     for elem in text_elements:
-        if sentence_check_count >= 5:  # Limit checks for performance
-            break
-        
+        # Check sentence length
         text = elem.get_text(strip=True)
-        if text and len(text.split()) > 30:  # Only check text with at least 10 words
+        if text and len(text.split()) > 35:
             long_sentences = _check_sentence_length(text, max_words=35)
             for sentence, word_count in long_sentences:
                 errors.append(
                     Error(
                         type=ErrorType.USER_EXPERIENCE,
                         subtype=ErrorSubType.READABILITY_SENTENCE_LENGTH,
-                        message=f"Sentence too long ({word_count} words, max 35 recommended for readability): '{sentence}...'",
+                        message=f"Sentence too long ({word_count} words, max 35 recommended): '{sentence}...'",
                     )
                 )
-                sentence_check_count += 1
+        
+        # Check color contrast
+        style = elem.get('style', '')
+        if style:
+            text_color_match = re.search(r'color\s*:\s*([^;]+)', style, re.IGNORECASE)
+            bg_color_match = re.search(r'background(-color)?\s*:\s*([^;]+)', style, re.IGNORECASE)
+
+            if text_color_match:
+                text_rgb = hex_to_rgb(text_color_match.group(1).strip())
+                if text_rgb:
+                    bg_rgb = (255, 255, 255)  # default white
+                    if bg_color_match:
+                        bg_rgb = hex_to_rgb(bg_color_match.group(2).strip()) or (255, 255, 255)
+                    
+                    ratio = contrast_ratio(text_rgb, bg_rgb)
+                    if ratio and ratio < 4.5:  # WCAG AA standard
+                        errors.append(
+                            Error(
+                                type=ErrorType.USER_EXPERIENCE,
+                                subtype=ErrorSubType.READABILITY_SENTENCE_LENGTH,
+                                message=f"Low color contrast ({ratio:.2f}:1, min 4.5:1 WCAG AA): {str(elem)[:80]}",
+                            )
+                        )
     
     return errors

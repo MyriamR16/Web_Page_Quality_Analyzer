@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Contrast Test Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Very low contrast - light gray on light gray */
+        .low-contrast-1 {
+            background-color: #f0f0f0;
+            color: #e8e8e8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* Low contrast - dark blue on dark gray */
+        .low-contrast-2 {
+            background-color: #2a2a2a;
+            color: #333333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* Low contrast - light blue on white */
+        .low-contrast-3 {
+            background-color: #ffffff;
+            color: #f0f4ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        /* Low contrast - gray on light gray */
+        .low-contrast-4 {
+            background-color: #eeeeee;
+            color: #d9d9d9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* Low contrast - dark gray on darker gray */
+        .low-contrast-5 {
+            background-color: #3a3a3a;
+            color: #4a4a4a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        /* Low contrast paragraph */
+        p.faded {
+            color: #e0e0e0;
+            background-color: #f5f5f5;
+        }
+
+        /* Low contrast with blue tones */
+        .blue-low-contrast {
+            background-color: #e8eef5;
+            color: #e0e6f0;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* Very low contrast with similar grays */
+        .gray-extreme {
+            background-color: #f2f2f2;
+            color: #efefef;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Low Contrast Test Page</h1>
+        <p class="description">This page contains multiple elements with low color contrast ratios that fail WCAG AA standards (4.5:1 minimum)</p>
+
+        <div class="low-contrast-1">
+            <h2>Section 1: Light Gray on Light Gray</h2>
+            <p>This text has very low contrast with its background. The color is almost imperceptible. This should trigger WCAG AA contrast ratio violations.</p>
+        </div>
+
+        <div class="low-contrast-2">
+            <h2>Section 2: Dark Blue on Dark Gray</h2>
+            <p>This text is barely visible due to insufficient contrast between the dark blue text and dark gray background. Users with vision impairment would struggle to read this.</p>
+        </div>
+
+        <div class="low-contrast-3">
+            <h2>Section 3: Light Blue on White</h2>
+            <p>The very light blue text is almost invisible on a white background. This creates serious accessibility issues for people with color blindness or low vision.</p>
+        </div>
+
+        <div class="low-contrast-4">
+            <h2>Section 4: Gray on Light Gray</h2>
+            <p>This section demonstrates another example of insufficient contrast. The text blends into the background making it nearly impossible to read comfortably.</p>
+        </div>
+
+        <div class="low-contrast-5">
+            <h2>Section 5: Dark Gray on Darker Gray</h2>
+            <p>Even in a dark theme, the contrast here is dangerously low. The colors are too similar to provide adequate visual separation.</p>
+        </div>
+
+        <div class="blue-low-contrast">
+            <h2>Section 6: Blue Tones Low Contrast</h2>
+            <p>This demonstrates how subtle color variations in the blue spectrum can still fail accessibility standards. The contrast ratio is well below the required 4.5:1.</p>
+        </div>
+
+        <div class="gray-extreme">
+            <h2>Section 7: Extreme Gray Similarity</h2>
+            <p>These grays are so similar that distinguishing the text from background is nearly impossible without zooming in or adjusting browser settings.</p>
+        </div>
+
+        <p class="faded">This paragraph uses a faded text color on the body background, creating another low-contrast scenario that will be detected by the accessibility checker.</p>
+
+        <div style="background-color: #cccccc; color: #c5c5c5; padding: 15px; margin: 15px 0;">
+            <h3>Section 8: Inline Low Contrast</h3>
+            <p>Another low contrast example with light gray text on a slightly darker gray background.</p>
+        </div>
+    </div>
+</body>
+</html>
