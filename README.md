@@ -2,7 +2,7 @@
 
 ## About
 
-Web Page Quality Analyzer provides a comprehensive toolkit for assessing website quality through automated analysis, and generates comprehensive quality reports.
+Web Page Quality Analyzer provides a comprehensive toolkit for assessing website quality through automated analysis, and generates comprehensive quality reports using LLMs.
 
 ## Architecture
 
