@@ -1,14 +1,14 @@
 # Web Page Quality Analyzer
 
-Analyseur de qualité de pages web avec :
-- une API Flask (`api/`)
-- une interface React + Vite (`app/`)
+A web page quality analyzer with:
+- a Flask API (`api/`)
+- a React + Vite frontend (`app/`)
 
-## Prérequis
+## Prerequisites
 
 - Python 3.10+
 
-## run the API
+## Run the API
 
 ```bash
 cd api
@@ -20,7 +20,7 @@ python main.py
 
 API available on `http://127.0.0.1:5000`.
 
-## run the front
+## Run the frontend
 
 ```bash
 cd app
@@ -28,4 +28,4 @@ npm install
 npm run dev
 ```
 
-Front available on `http://localhost:5173`.
+Frontend available on `http://localhost:5173`.
