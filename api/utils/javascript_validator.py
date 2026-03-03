@@ -36,10 +36,26 @@ async def _load_page_with_listeners(
     page.on("console", lambda msg: console_messages.append((msg.type, msg.text)))
     page.on("pageerror", lambda exc: page_errors.append(str(exc)))
 
-    try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-    except Exception as exc:
-        nav_error = exc
+    # Try navigation with retries for network errors
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            break  # Success, exit retry loop
+        except Exception as exc:
+            error_str = str(exc)
+            # Retry on network-related errors
+            if attempt < max_retries - 1 and any(err in error_str for err in [
+                'ERR_NETWORK_CHANGED',
+                'ERR_CONNECTION',
+                'net::ERR',
+                'Timeout'
+            ]):
+                logger.warning(f"Network error on attempt {attempt + 1}, retrying: {error_str}")
+                continue
+            # If final attempt or non-retryable error, record it
+            nav_error = exc
+            break
 
     return browser, page, console_messages, page_errors, nav_error
 

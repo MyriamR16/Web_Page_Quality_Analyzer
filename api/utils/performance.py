@@ -54,12 +54,22 @@ async def check_performance_errors(
         page.on("response", on_response)
 
         start_time = time.time()
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            # Wait for images and resources to load
-            await page.wait_for_load_state("networkidle", timeout=10000)
-        except Exception as exc:
-            logger.warning("Navigation error on %s: %s", url, exc)
+        
+        # Try navigation with retries for network errors
+        for attempt in range(3):
+            try:
+                await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                # Wait for images and resources to load
+                await page.wait_for_load_state("networkidle", timeout=10000)
+                break
+            except Exception as exc:
+                error_str = str(exc)
+                if attempt < 2 and any(err in error_str for err in ['ERR_NETWORK_CHANGED', 'ERR_CONNECTION', 'net::ERR']):
+                    logger.warning("Network error on attempt %d for %s: %s", attempt + 1, url, exc)
+                    continue
+                logger.warning("Navigation error on %s: %s", url, exc)
+                break
+                
         load_time = time.time() - start_time
 
         # Check slow images

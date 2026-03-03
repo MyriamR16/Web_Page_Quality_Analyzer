@@ -69,17 +69,29 @@ async def check_unsecure_forms(url: str) -> list:
         async with async_playwright() as p:
             browser = await p.chromium.launch()
             page = await browser.new_page()
-            await page.goto(url, wait_until="domcontentloaded")
             
-            forms = await page.query_selector_all("form[method='POST']")
-            for form in forms:
-                action = await form.get_attribute("action")
-                if action and not action.startswith("https://"):
-                    errors.append(Error(
-                        type=ErrorType.SECURITY,
-                        subtype=ErrorSubType.UNSECURE_FORM,
-                        message=f"Form submits to non-HTTPS URL: {action}",
-                    ))
+            # Try navigation with retries for network errors
+            nav_success = False
+            for attempt in range(3):
+                try:
+                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    nav_success = True
+                    break
+                except Exception as exc:
+                    if attempt < 2 and any(err in str(exc) for err in ['ERR_NETWORK_CHANGED', 'ERR_CONNECTION', 'net::ERR', 'Timeout']):
+                        continue
+                    raise
+            
+            if nav_success:
+                forms = await page.query_selector_all("form[method='POST']")
+                for form in forms:
+                    action = await form.get_attribute("action")
+                    if action and not action.startswith("https://"):
+                        errors.append(Error(
+                            type=ErrorType.SECURITY,
+                            subtype=ErrorSubType.UNSECURE_FORM,
+                            message=f"Form submits to non-HTTPS URL: {action}",
+                        ))
             
             await browser.close()
     except Exception:
@@ -102,28 +114,40 @@ async def check_cookies_flags(url: str) -> list:
         async with async_playwright() as p:
             browser = await p.chromium.launch()
             page = await browser.new_page()
-            await page.goto(url, wait_until="domcontentloaded")
             
-            cookies = await page.context.cookies()
-            for cookie in cookies:
-                if not cookie.get("secure"):
-                    errors.append(Error(
-                        type=ErrorType.SECURITY,
-                        subtype=ErrorSubType.COOKIE_MISSING_SECURE_FLAG,
-                        message=f"Cookie '{cookie.get('name')}' is not marked as Secure.",
-                    ))
-                if not cookie.get("httpOnly"):
-                    errors.append(Error(
-                        type=ErrorType.SECURITY,
-                        subtype=ErrorSubType.COOKIE_MISSING_HTTPONLY_FLAG,
-                        message=f"Cookie '{cookie.get('name')}' is not marked as HttpOnly.",
-                    ))
-                if not cookie.get("sameSite"):
-                    errors.append(Error(
-                        type=ErrorType.SECURITY,
-                        subtype=ErrorSubType.COOKIE_MISSING_SAMESITE_FLAG,
-                        message=f"Cookie '{cookie.get('name')}' does not have SameSite flag.",
-                    ))
+            # Try navigation with retries for network errors
+            nav_success = False
+            for attempt in range(3):
+                try:
+                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    nav_success = True
+                    break
+                except Exception as exc:
+                    if attempt < 2 and any(err in str(exc) for err in ['ERR_NETWORK_CHANGED', 'ERR_CONNECTION', 'net::ERR', 'Timeout']):
+                        continue
+                    raise
+            
+            if nav_success:
+                cookies = await page.context.cookies()
+                for cookie in cookies:
+                    if not cookie.get("secure"):
+                        errors.append(Error(
+                            type=ErrorType.SECURITY,
+                            subtype=ErrorSubType.COOKIE_MISSING_SECURE_FLAG,
+                            message=f"Cookie '{cookie.get('name')}' is not marked as Secure.",
+                        ))
+                    if not cookie.get("httpOnly"):
+                        errors.append(Error(
+                            type=ErrorType.SECURITY,
+                            subtype=ErrorSubType.COOKIE_MISSING_HTTPONLY_FLAG,
+                            message=f"Cookie '{cookie.get('name')}' is not marked as HttpOnly.",
+                        ))
+                    if not cookie.get("sameSite"):
+                        errors.append(Error(
+                            type=ErrorType.SECURITY,
+                            subtype=ErrorSubType.COOKIE_MISSING_SAMESITE_FLAG,
+                            message=f"Cookie '{cookie.get('name')}' does not have SameSite flag.",
+                        ))
             
             await browser.close()
     except Exception:
