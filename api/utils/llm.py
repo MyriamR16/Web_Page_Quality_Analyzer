@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_report(errors: List[Dict[str, Any]], url: str) -> Dict[str, Any]:
-    """
+    """branch is 9 commits ahead of an
     Generates a quality report using OpenAI GPT.
     
     Args:
@@ -35,7 +35,7 @@ Generate:
 1. A clear summary (2-3 sentences)
 2. Improvement recommendations (bullet points)
 3. Prioritization of issues:
-   - CRITICAL: Must fix immediately (security, major functionality)
+   - CRITICAL: Must fix immediately (security, major functionality). If there are no critical issues, say "No critical issues detected."
    - WARNING: Should fix soon (performance, UX)
    - INFO: Nice to have (accessibility, minor issues)
 
