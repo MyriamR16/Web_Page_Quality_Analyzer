@@ -13,8 +13,26 @@ The application consists of:
 ## Prerequisites
 
 - Python 3.10+
+- Node.js 18+
+- Cohere API key (get one at https://cohere.com)
 
 ## Run the API
+
+### 1. Configure environment variables
+
+Create a `.env` file in the `api/` directory:
+
+```bash
+cd api
+cp .env.example .env
+```
+
+Edit `.env` and add your Cohere API key:
+```
+COHERE_API_KEY=your_cohere_api_key_here
+```
+
+### 2. Install dependencies and run
 
 ```bash
 cd api
