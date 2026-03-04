@@ -333,13 +333,13 @@ function App() {
                           onClick={handleDownloadPDF}
                           className="download-button download-pdf"
                         >
-                          📄 Download as PDF
+                          Download as PDF
                         </button>
                         <button 
                           onClick={handleDownloadJSON}
                           className="download-button download-json"
                         >
-                          📋 Download as JSON
+                          Download as JSON
                         </button>
                       </div>
                     </div>
